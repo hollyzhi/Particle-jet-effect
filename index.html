@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<meta charset="utf-8">
+<head><title>Draw a Circle</title>
+    <style type="text/css">
+        body {
+            background-color: #000000;
+            margin: 0px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<script>
+    (function() {
+        var lastTime = 0;
+        var vendors = ['webkit', 'moz'];
+        for(var x = 0; x < vendors.length; ++x) {
+            window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+            window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] ||
+                    window[vendors[x] + 'CancelRequestAnimationFrame'];
+        }
+        if (!window.requestAnimationFrame) {
+            window.requestAnimationFrame = function(callback, element) {
+                var currTime = new Date().getTime();
+                var timeToCall = Math.max(0, 16.7 - (currTime - lastTime));
+                var id = window.setTimeout(function() {
+                    callback(currTime + timeToCall);
+                }, timeToCall);
+                lastTime = currTime + timeToCall;
+                return id;
+            };
+        }
+        if (!window.cancelAnimationFrame) {
+            window.cancelAnimationFrame = function(id) {
+                clearTimeout(id);
+            };
+        }
+    }());
+    var	canvas = document.createElement( 'canvas' ),
+            context = canvas.getContext( '2d' );
+    var canvasWidth = window.innerWidth;
+    canvasHeight = window.innerHeight;
+    var particles = [];
+    function init() {
+        document.body.appendChild(canvas);
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(init);
+    function loop(){
+        context.fillStyle = "rgba(0,0,0,1)";
+        context.fillRect(0,0, canvasWidth, canvasHeight);
+        var particle = new Particle(canvasWidth/2, canvasHeight/2);
+        particle.xVel = Math.random()*4-2;
+        particles.push(particle);
+        for (var i=0; i<particles.length; i++) {
+            var particle = particles[i];
+            particle.render(context);
+            particle.update();
+        }
+        if (particles.length>300){
+            particles.shift();
+        }
+        requestAnimationFrame(loop);
+    }
+    function Particle (xPos, yPos) {
+        this.xPos = xPos;
+        this.yPos = yPos;
+        this.yVel = -4.4;
+        this.xVel = 0;
+        this.gravity = 0.03;//重力影响
+        this.counter = 290;//影响颜色
+        this.render = function(c){
+            c.fillStyle = "hsl("+this.counter+", 90%, 60%)";//注意这里啦
+            c.beginPath();
+            c.arc(this.xPos, this.yPos, 5, 0, Math.PI*2, true);
+            c.fill();
+        };
+        this.update = function(){
+            this.yVel += this.gravity;
+            this.yPos += this.yVel;
+            this.xPos += this.xVel;
+            this.counter +=2;//加一点点
+        }
+    }
+</script>
+</body>
+</html>
